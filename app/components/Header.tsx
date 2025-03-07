@@ -2,22 +2,40 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { useSession, signOut } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLUListElement>(null);
-  const buttonRef = useRef<HTMLButtonElement>(null); // Ref for menu button
-  const { data: session, status } = useSession();
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const router = useRouter();
 
-  // Close menu when clicking outside but NOT when clicking inside the menu
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+// Check for JWT token on component mount and whenever `token` changes
+useEffect(() => {
+  if (typeof window !== "undefined") { // Ensure it runs only on client-side
+    const token = localStorage.getItem("token");
+    setIsAuthenticated(!!token); 
+  }
+}, []);
+
+
+  // Logout function
+  const handleLogout = () => {
+    localStorage.removeItem("token"); // Remove token
+    setIsAuthenticated(false); // Update auth state
+    router.push("/login"); // Redirect to login
+  };
+
+  // Close menu when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
         menuRef.current &&
-        !menuRef.current.contains(event.target as Node) && // Click is outside menu
+        !menuRef.current.contains(event.target as Node) &&
         buttonRef.current &&
-        !buttonRef.current.contains(event.target as Node) // Click is NOT the button
+        !buttonRef.current.contains(event.target as Node)
       ) {
         setIsMenuOpen(false);
       }
@@ -32,25 +50,20 @@ export default function Header() {
     };
   }, [isMenuOpen]);
 
-  // Close menu immediately when clicking a navigation link
-  const handleNavClick = () => {
-    setIsMenuOpen(false);
-  };
-
   return (
     <nav className="fixed top-0 left-0 w-full bg-white shadow-md z-[100] px-4 py-4 flex justify-between items-center rounded-xl">
       {/* Logo */}
-      <Link href="/" className="text-2xl font-bold flex items-center active:scale-105" onClick={handleNavClick}>
+      <Link href="/" className="text-2xl font-bold flex items-center" onClick={() => setIsMenuOpen(false)}>
         <span className="ml-2 font-extrabold font-[cursive] italic">ThinkViL</span>
       </Link>
 
       {/* Mobile Menu Button */}
       <button
-        ref={buttonRef} // Assign button reference
-        className="md:hidden focus:outline-none"
-        onClick={() => setIsMenuOpen(prev => !prev)}
+        ref={buttonRef}
+        className="block md:hidden focus:outline-none"
+        onClick={() => setIsMenuOpen((prev) => !prev)}
       >
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={isMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16m-7 6h7"}></path>
         </svg>
       </button>
@@ -60,13 +73,11 @@ export default function Header() {
         ref={menuRef}
         className={`absolute md:static top-16 left-0 w-full md:w-auto bg-white md:bg-transparent md:flex md:space-x-2 p-4 md:p-0 shadow-md md:shadow-none transition-all ${isMenuOpen ? "block" : "hidden"}`}
       >
-        {[
-          { href: "/simulations/physics", label: "Physics" },
+        {[{ href: "/simulations/physics", label: "Physics" },
           { href: "/simulations/mathematics", label: "Mathematics" },
           { href: "/simulations/chemistry", label: "Chemistry" },
-          { href: "/about", label: "About" },
-        ].map(({ href, label }) => (
-          <li key={href} onClick={handleNavClick}>
+          { href: "/about", label: "About" }].map(({ href, label }) => (
+          <li key={href} onClick={() => setIsMenuOpen(false)}>
             <Link href={href} className="px-3 py-2 rounded-xl font-semibold block hover:bg-sky-300 hover:text-black">
               {label}
             </Link>
@@ -74,13 +85,10 @@ export default function Header() {
         ))}
 
         {/* Login / Logout Button */}
-        <li onClick={handleNavClick}>
-          {status === "authenticated" ? (
+        <li>
+          {isAuthenticated ? (
             <button
-              onClick={() => {
-                signOut();
-                setIsMenuOpen(false);
-              }}
+              onClick={handleLogout}
               className="px-3 py-2 rounded-xl font-semibold block bg-red-600 text-white hover:bg-red-700 transition"
             >
               Logout
@@ -88,7 +96,7 @@ export default function Header() {
           ) : (
             <Link
               href="/login"
-              className="login-donate-btn px-3 py-2 rounded-xl font-semibold block bg-blue-600 text-white hover:bg-blue-700 transition"
+              className="px-3 py-2 rounded-xl font-semibold block bg-blue-600 text-white hover:bg-blue-700 transition"
             >
               Login
             </Link>
@@ -98,11 +106,7 @@ export default function Header() {
 
       {/* Right Section (Donate) */}
       <div className="flex items-center space-x-4">
-        {/* Donate Button */}
-        <Link
-          href="/donate"
-          className="login-donate-btn px-4 py-2 bg-red-500 text-white rounded-xl hover:text-black transition font-semibold"
-        >
+        <Link href="/donate" className="px-4 py-2 bg-red-500 text-white rounded-xl hover:text-black transition font-semibold">
           Donate
         </Link>
       </div>
