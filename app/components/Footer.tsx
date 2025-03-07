@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FaLinkedin, FaTwitter, FaEnvelope, FaPhone } from "react-icons/fa";
+import { FaLinkedin, FaTwitter, FaInstagram, FaEnvelope } from "react-icons/fa";
 
 export default function Footer() {
   const pathname = usePathname();
@@ -35,9 +35,6 @@ export default function Footer() {
                   {title}
                 </Link>
               </li>
-            //    <li>
-            //    <link href="/about" className="hover:text-blue-600 transition duration-200 hover:underline">About Us</link> 
-            //  </li>
             ))}
           </ul>
         </div>
@@ -46,11 +43,14 @@ export default function Footer() {
         <div>
           <h3 className="text-2xl font-bold mb-3">Follow Us</h3>
           <div className="flex justify-center md:justify-start space-x-4 mb-4">
-            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="text-gray-600 hover:text-blue-600 transition">
+            <a href="https://www.linkedin.com/company/thinkvil" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="text-gray-600 hover:text-blue-600 transition">
               <FaLinkedin size={24} />
             </a>
             <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" aria-label="Twitter" className="text-gray-600 hover:text-blue-600 transition">
               <FaTwitter size={24} />
+            </a>
+            <a href="https://www.instagram.com/thinkvil" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="text-gray-600 hover:text-blue-600 transition">
+              <FaInstagram size={24} />
             </a>
             <a
               href="https://mail.google.com/mail/?view=cm&fs=1&to=contact.thinkvil@gmail.com"
@@ -62,11 +62,6 @@ export default function Footer() {
               <FaEnvelope size={24} />
             </a>
           </div>
-          {/* <p className="font-semibold flex items-center justify-center md:justify-start">
-            <a href="tel:+916377472807" aria-label="Phone" className="text-gray-600 hover:text-blue-600 transition">
-              <FaPhone size={24} />
-            </a>
-          </p> */}
         </div>
       </div>
 
